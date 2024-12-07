@@ -1,0 +1,33 @@
+import asyncio
+import requests
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import CommandStart
+from aiogram.types import Message
+
+# Bot tokenini kiriting
+bot = Bot(token='7107778478:AAGzkWKefTeGqcChj2-ltb8BVcSCcNK1_vY')
+dp = Dispatcher()
+
+@dp.message(CommandStart())
+async def start(message: Message):
+    await message.answer("Salom! Menga biror so'z yuboring va men sizga uning haqida ma'lumot topib beraman.")
+
+@dp.message()
+async def fetch_info(message: Message):
+    query = message.text
+    await message.answer("Ma'lumot izlayapman, bir oz kuting...")
+
+    # Veb so'rovni amalga oshirish
+    response = requests.get(f'https://api.duckduckgo.com/?q={query}&format=json')
+    data = response.json()
+
+    if 'AbstractText' in data and data['AbstractText']:
+        await message.answer(data['AbstractText'])
+    else:
+        await message.answer("Kechirasiz, men bu so'z haqida ma'lumot topa olmadim.")
+
+async def main():
+    await dp.start_polling(bot)
+
+if __name__ == '__main__':
+    asyncio.run(main())
